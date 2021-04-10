@@ -1,59 +1,96 @@
 package model
 
+import (
+	"log"
+)
+
 type Grammar struct {
-	RuleSpecs []RuleSpec
+	ruleSpecs []RuleSpec
 }
 
 func (g *Grammar) ToRegex() ASTRegex {
-	defines := make([]Define, len(g.RuleSpecs))
-	for i, x := range g.RuleSpecs {
+	defines := make([]Define, len(g.ruleSpecs))
+	for i, x := range g.ruleSpecs {
 		defines[i] = x.ToRegex()
 	}
 	return ASTRegex{Defines: defines}
 }
 
 type RuleSpec struct {
-	RuleRef string
-	Alternatives []Alternative
+	ruleRef string
+	alternatives []Alternative
 }
 
 func (r *RuleSpec) ToRegex() Define {
 	ret := Define{}
-	ret.DefineName = r.RuleRef
-	ret.RegexSteps = make([]RegexStep, len(r.Alternatives))
-	for i, x := r.Alternatives {
-		ret.RegexSteps[i] = x.ToRegex(r.RuleRef)
+	ret.defineName = r.ruleRef
+	ret.regexSteps = make([]RegexStep, len(r.alternatives))
+	for i, x := range r.alternatives[0].elements {
+		ret.regexSteps[i] = x.ToRegex()
 	}
+	ret.regexSteps = altToRegexPost(r.ruleRef, ret.regexSteps)
+	return ret
 }
 
-type Alternative struct {
-	Elements []Element
-}
-
-func (a *Alternative) ToRegex(name string) {
-	altRegexes := make([]RegexStep, len(a.Elements))
-	for i, x := range a.Elements {
-		altRegexes[i] = x.ToRegex()
-	}
-	return altToRegexPost(name, altRegexes)
-}
-
-func altToRegexPost(name, altRegexes) {
-	return appenCtorStep(name, insertPosSaveStep(isToken(name)))
+func altToRegexPost(name string, regexSteps []RegexStep) []RegexStep {
+	return appendCtorStep(name, insertPosSaveStep(isToken(name), regexSteps))
 }
 
 func insertPosSaveStep(isToken bool, regexSteps []RegexStep) []RegexStep {
 	if isToken {
-		return append([]RegexStep{PositionSaveStep}, regexSteps...)
+		return append([]RegexStep{PositionSaveStep{}}, regexSteps...)
 	}
 	return regexSteps
 }
 
 func appendCtorStep(name string, regexSteps []RegexStep) []RegexStep {
+	callStepCount := 0
+	for _, x := range regexSteps {
+		if _, ok := x.(CallStep); ok {
+			callStepCount++
+		}
+	}
+	if callStepCount > 0 {
+		return append(regexSteps, MatchCombineStep{combineRuleName: name, depth: callStepCount})
+	} else {
+		return append(regexSteps, MatchSaveStep{saveRuleName: name})
+	}
+}
 
+type Alternative struct {
+	elements []Element
+}
+
+func (a *Alternative) ToRegex() []RegexStep {
+	altRegexes := make([]RegexStep, len(a.elements))
+	for i, x := range a.elements {
+		altRegexes[i] = x.ToRegex()
+	}
+	return altRegexes
+}
 
 type Element interface {
 	ElementMarker()
+	ToRegex() RegexStep
+}
+
+func (q Quoted) ToRegex() RegexStep {
+	return MatchStep{matchString: unquote(q.quoted)}
+}
+
+func (r RuleRef) ToRegex() RegexStep {
+	return CallStep{callee: r.ruleRefName}
+}
+
+func isToken(s string) bool {
+	if s == "" {
+		log.Fatal("isToken failed for empty string")
+	}
+	return s[0] >= 'A' && s[0] <= 'Z'
+}
+
+func unquote(s string) string {
+	return s[1:len(s) - 1]
 }
 
 type RuleRef struct {
@@ -63,7 +100,7 @@ type RuleRef struct {
 func (RuleRef) ElementMarker() {}
 
 type Quoted struct {
-	Quoted string
+	quoted string
 }
 
 func (Quoted) ElementMarker() {}
