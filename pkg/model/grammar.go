@@ -23,12 +23,12 @@ type RuleSpec struct {
 
 func (r *RuleSpec) ToRegex() Define {
 	ret := Define{}
-	ret.defineName = r.ruleRef
-	ret.regexSteps = make([]RegexStep, len(r.alternatives))
+	ret.DefineName = r.ruleRef
+	ret.RegexSteps = make([]RegexStep, len(r.alternatives[0].elements))
 	for i, x := range r.alternatives[0].elements {
-		ret.regexSteps[i] = x.ToRegex()
+		ret.RegexSteps[i] = x.ToRegex()
 	}
-	ret.regexSteps = altToRegexPost(r.ruleRef, ret.regexSteps)
+	ret.RegexSteps = altToRegexPost(r.ruleRef, ret.RegexSteps)
 	return ret
 }
 
@@ -53,7 +53,7 @@ func appendCtorStep(name string, regexSteps []RegexStep) []RegexStep {
 	if callStepCount > 0 {
 		return append(regexSteps, MatchCombineStep{combineRuleName: name, depth: callStepCount})
 	} else {
-		return append(regexSteps, MatchSaveStep{saveRuleName: name})
+		return append(regexSteps, MatchSaveStep{SaveRuleName: name})
 	}
 }
 
@@ -75,7 +75,7 @@ type Element interface {
 }
 
 func (q Quoted) ToRegex() RegexStep {
-	return MatchStep{matchString: unquote(q.quoted)}
+	return MatchStep{MatchString: unquote(q.quoted)}
 }
 
 func (r RuleRef) ToRegex() RegexStep {

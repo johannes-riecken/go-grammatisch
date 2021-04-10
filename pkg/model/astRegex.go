@@ -16,7 +16,7 @@ func (a ASTRegex) String() string {
 		log.Fatal("ASTRegex must contain at least one Define")
 	}
 	buf := new(strings.Builder)
-	buf.WriteString(fmt.Sprintf("\\A (?&%v) \\z\n(?(DEFINE)\n", a.Defines[0].defineName))
+	buf.WriteString(fmt.Sprintf("\\A (?&%v) \\z\n(?(DEFINE)\n", a.Defines[0].DefineName))
 	for _, x := range a.Defines {
 		buf.WriteString(x.String())
 		buf.WriteString("\n")
@@ -26,19 +26,19 @@ func (a ASTRegex) String() string {
 }
 
 type Define struct {
-	defineName string
-	regexSteps []RegexStep
+	DefineName string
+	RegexSteps []RegexStep
 }
 
 func (d *Define) String() string {
-	if len(d.regexSteps) == 0 {
+	if len(d.RegexSteps) == 0 {
 		log.Fatalf("Define must contain at least one RegexStep")
 	}
 	buf := new(strings.Builder)
 	buf.WriteString("(?<")
-	buf.WriteString(d.defineName)
+	buf.WriteString(d.DefineName)
 	buf.WriteString("> ")
-	for _, x := range d.regexSteps {
+	for _, x := range d.RegexSteps {
 		buf.WriteString(x.String())
 		buf.WriteString(" ")
 	}
@@ -70,13 +70,13 @@ type MatchCombineStep struct {
 func (MatchCombineStep) RegexStepMarker() {}
 
 type MatchSaveStep struct {
-	saveRuleName string
+	SaveRuleName string
 }
 
 func (MatchSaveStep) RegexStepMarker() {}
 
 type MatchStep struct {
-	matchString string
+	MatchString string
 }
 
 func (MatchStep) RegexStepMarker() {}
@@ -99,7 +99,7 @@ func (m MatchCombineStep) String() string {
 	children := new(strings.Builder)
 	for i, x := range arr[1:] {
 		children.WriteString(indexOfR(x))
-		if i < len(arr) - 1 {
+		if i < len(arr[1:]) - 1 {
 			children.WriteString(", ")
 		}
 	}
@@ -107,11 +107,11 @@ func (m MatchCombineStep) String() string {
 }
 
 func (m MatchStep) String() string {
-	return fmt.Sprintf("(?: %v )", m.matchString)
+	return fmt.Sprintf("(?: %v )", m.MatchString)
 }
 
 func (m MatchSaveStep) String() string {
-	return fmt.Sprintf("(?{ [$^R->[0], ['%v', $^R->[1], pos(), []]] })", m.saveRuleName)
+	return fmt.Sprintf("(?{ [$^R->[0], ['%v', $^R->[1], pos(), []]] })", m.SaveRuleName)
 }
 
 func indexOfR(indexes []int) string {
