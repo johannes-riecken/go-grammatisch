@@ -6,6 +6,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/johannes-riecken/go-grammatisch/pkg/model"
 	"net/http"
+	"os"
+	"os/exec"
 )
 
 func main() {
@@ -25,7 +27,31 @@ func main() {
 			return
 		}
 		generatedSource = grammar.ToRegex()
-		c.HTML(http.StatusOK, "index.gohtml", gin.H{"generatedSource": generatedSource})
+
+		inputDoc := c.Query("input-doc")
+		var outputAST []byte
+		if inputDoc != "" {
+			inputFile, err := os.Create("input.txt")
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, fmt.Sprintf("failed to create input file: %v", err))
+				return
+			}
+			defer inputFile.Close()
+			inputFile.WriteString(inputDoc)
+			regexFile, err := os.Create("regex.txt")
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, fmt.Sprintf("failed to create regex file: %v", err))
+				return
+			}
+			defer regexFile.Close()
+			regexFile.WriteString(generatedSource.String())
+			outputAST, err = exec.Command("perl", "generateSyntaxTree.pl").Output()
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, fmt.Sprintf("failed to execute perl script: %v", err))
+				return
+			}
+		}
+		c.HTML(http.StatusOK, "index.gohtml", gin.H{"generatedSource": generatedSource, "outputAST": string(outputAST)})
 	})
 	_ = r.Run()
 }
