@@ -1,6 +1,5 @@
 #!/usr/bin/perl -w
-use v5.30;
-use Data::Dumper;
+use v5.20;
 use JSON::PP;
 use re 'eval';
 my $text;
