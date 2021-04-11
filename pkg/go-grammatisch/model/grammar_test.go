@@ -7,9 +7,9 @@ import (
 
 func TestGrammar_ToRegex(t *testing.T) {
 	tests := []struct {
-		name   string
+		name string
 		args Grammar
-		want   ASTRegex
+		want ASTRegex
 	}{
 		{name: "convert simple grammar", args: 		Grammar{
 			RuleSpecs: []RuleSpec{
@@ -25,15 +25,15 @@ func TestGrammar_ToRegex(t *testing.T) {
 				},
 			},
 		},
-		want: ASTRegex{[]Define{{"Foo", []RegexStep{PositionSaveStep{},MatchStep{"bar"},MatchSaveStep{"Foo"}}}}},
+		want: ASTRegex{[]Define{{"Foo", []RegexStep{PositionSaveStep{}, MatchStep{"bar"}, MatchSaveStep{"Foo"}}}}},
 			},
 			{name: "convert more complex grammar", args: Grammar{
-			[]RuleSpec{{"foo",[]Alternative{{[]Element{RuleRef{"Bar"},RuleRef{"Bar"}}}}},{"Bar",[]Alternative{{[]Element{Quoted{"'baz'"}}}}},
+			[]RuleSpec{{"foo",[]Alternative{{[]Element{RuleRef{"Bar"}, RuleRef{"Bar"}}}}},{"Bar",[]Alternative{{[]Element{Quoted{"'baz'"}}}}},
 			/*
 			Just (Grammar [RuleSpec "foo" [Alternative [RuleRef "Bar" Nothing, RuleRef "Bar" Nothing]], RuleSpec "Bar" [Alternative [Quoted "'baz'" Nothing]]])
 			 */
-			}}, want: ASTRegex{[]Define{{"foo",[]RegexStep{CallStep{"Bar"},CallStep{"Bar"},MatchCombineStep{"foo",2}}},
-				{"Bar",[]RegexStep{PositionSaveStep{},MatchStep{"baz"},MatchSaveStep{"Bar"}}}}}},
+			}}, want: ASTRegex{[]Define{{"foo",[]RegexStep{CallStep{"Bar"}, CallStep{"Bar"}, MatchCombineStep{"foo",2}}},
+				{"Bar",[]RegexStep{PositionSaveStep{}, MatchStep{"baz"}, MatchSaveStep{"Bar"}}}}}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

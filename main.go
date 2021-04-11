@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/johannes-riecken/go-grammatisch/pkg/model"
+	"github.com/johannes-riecken/go-grammatisch/pkg/go-grammatisch/model"
 	"net/http"
 	"os"
 	"os/exec"
