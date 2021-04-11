@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1>Konvertiere deine ANTLR-Grammatik in ein ausführbares Projekt, das Dokumente in passende Syntaxbäume umwandelt</h1>
+<h2>Wie ANTLR, nur mit esoterischeren Projektformaten, z.B. Perl Regex</h2>
+<form>
+    <div>
+        <label for="grammar-id">Gehe zu Grammatik</label>
+        <select id="grammar-id" name="grammar">
+            <option value="calculator">Calculator</option>
+            <option value="simple">Simple grammar</option>
+        </select>
+    </div>
+    <div>
+        <p>Die Grammatik wird momentan noch als JSON übergeben. Später soll Eingabe im ANTLR-Format möglich sein</p>
+        <textarea id="grammar-content" name="grammar-content">
+Foo : 'bar' ;</textarea>
+        <textarea id="generated-source">{{ .generatedSource }}</textarea>
+    </div>
+    <div>
+        <button type="submit">Convert</button>
+    </div>
+</form>
+</body>
+</html>
