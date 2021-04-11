@@ -64,7 +64,7 @@ func (CallStep) RegexStepMarker() {}
 
 type MatchCombineStep struct {
 	combineRuleName string
-	depth int
+	depth           int
 }
 
 func (MatchCombineStep) RegexStepMarker() {}
@@ -99,7 +99,7 @@ func (m MatchCombineStep) String() string {
 	children := new(strings.Builder)
 	for i, x := range arr[1:] {
 		children.WriteString(indexOfR(x))
-		if i < len(arr[1:]) - 1 {
+		if i < len(arr[1:])-1 {
 			children.WriteString(", ")
 		}
 	}
@@ -119,7 +119,7 @@ func indexOfR(indexes []int) string {
 	buf.WriteString("$^R->[")
 	for i, x := range indexes {
 		buf.WriteString(fmt.Sprintf("%v", x))
-		if i != len(indexes) - 1 {
+		if i != len(indexes)-1 {
 			buf.WriteString("][")
 		}
 	}
@@ -154,7 +154,7 @@ func unfoldAnnotatedRegexTree(n int) *tree {
 }
 
 type tree struct {
-	val []int
-	left *tree
+	val   []int
+	left  *tree
 	right *tree
 }

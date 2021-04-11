@@ -67,15 +67,15 @@ func fakeUnmarshal(b []byte, grammar *model.Grammar) error {
 							model.Quoted{
 								Quoted: "'bar'",
 							},
-											},
-										}},
+						},
+					}},
 				},
 			},
 		}
 		return nil
 	}
-	if string(b) == "foo : Bar Bar;\r\n" +
-"Bar : 'baz';" {
+	if string(b) == "foo : Bar Bar;\r\n"+
+		"Bar : 'baz';" {
 		*grammar = model.Grammar{
 			RuleSpecs: []model.RuleSpec{{RuleRef: "foo", Alternatives: []model.Alternative{{Elements: []model.Element{model.RuleRef{RuleRefName: "Bar"},
 				model.RuleRef{RuleRefName: "Bar"}}}}}, {RuleRef: "Bar", Alternatives: []model.Alternative{{Elements: []model.Element{model.Quoted{Quoted: "'baz'"}}}}}}}

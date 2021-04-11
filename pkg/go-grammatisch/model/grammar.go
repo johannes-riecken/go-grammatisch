@@ -90,7 +90,7 @@ func isToken(s string) bool {
 }
 
 func unquote(s string) string {
-	return s[1:len(s) - 1]
+	return s[1 : len(s)-1]
 }
 
 type RuleRef struct {
