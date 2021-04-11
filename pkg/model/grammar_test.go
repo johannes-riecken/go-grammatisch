@@ -12,13 +12,13 @@ func TestGrammar_ToRegex(t *testing.T) {
 		want   ASTRegex
 	}{
 		{name: "convert simple grammar", args: 		Grammar{
-			ruleSpecs: []RuleSpec{
+			RuleSpecs: []RuleSpec{
 				{
-					ruleRef: "Foo",
-					alternatives: []Alternative{Alternative{
-						elements: []Element{
+					RuleRef: "Foo",
+					Alternatives: []Alternative{Alternative{
+						Elements: []Element{
 							Quoted{
-								quoted: "'bar'",
+								Quoted: "'bar'",
 							},
 						},
 					}},

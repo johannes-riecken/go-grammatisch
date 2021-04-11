@@ -5,30 +5,30 @@ import (
 )
 
 type Grammar struct {
-	ruleSpecs []RuleSpec
+	RuleSpecs []RuleSpec
 }
 
 func (g *Grammar) ToRegex() ASTRegex {
-	defines := make([]Define, len(g.ruleSpecs))
-	for i, x := range g.ruleSpecs {
+	defines := make([]Define, len(g.RuleSpecs))
+	for i, x := range g.RuleSpecs {
 		defines[i] = x.ToRegex()
 	}
 	return ASTRegex{Defines: defines}
 }
 
 type RuleSpec struct {
-	ruleRef string
-	alternatives []Alternative
+	RuleRef      string
+	Alternatives []Alternative
 }
 
 func (r *RuleSpec) ToRegex() Define {
 	ret := Define{}
-	ret.DefineName = r.ruleRef
-	ret.RegexSteps = make([]RegexStep, len(r.alternatives[0].elements))
-	for i, x := range r.alternatives[0].elements {
+	ret.DefineName = r.RuleRef
+	ret.RegexSteps = make([]RegexStep, len(r.Alternatives[0].Elements))
+	for i, x := range r.Alternatives[0].Elements {
 		ret.RegexSteps[i] = x.ToRegex()
 	}
-	ret.RegexSteps = altToRegexPost(r.ruleRef, ret.RegexSteps)
+	ret.RegexSteps = altToRegexPost(r.RuleRef, ret.RegexSteps)
 	return ret
 }
 
@@ -58,12 +58,12 @@ func appendCtorStep(name string, regexSteps []RegexStep) []RegexStep {
 }
 
 type Alternative struct {
-	elements []Element
+	Elements []Element
 }
 
 func (a *Alternative) ToRegex() []RegexStep {
-	altRegexes := make([]RegexStep, len(a.elements))
-	for i, x := range a.elements {
+	altRegexes := make([]RegexStep, len(a.Elements))
+	for i, x := range a.Elements {
 		altRegexes[i] = x.ToRegex()
 	}
 	return altRegexes
@@ -75,11 +75,11 @@ type Element interface {
 }
 
 func (q Quoted) ToRegex() RegexStep {
-	return MatchStep{MatchString: unquote(q.quoted)}
+	return MatchStep{MatchString: unquote(q.Quoted)}
 }
 
 func (r RuleRef) ToRegex() RegexStep {
-	return CallStep{callee: r.ruleRefName}
+	return CallStep{callee: r.RuleRefName}
 }
 
 func isToken(s string) bool {
@@ -94,13 +94,13 @@ func unquote(s string) string {
 }
 
 type RuleRef struct {
-	ruleRefName string
+	RuleRefName string
 }
 
 func (RuleRef) ElementMarker() {}
 
 type Quoted struct {
-	quoted string
+	Quoted string
 }
 
 func (Quoted) ElementMarker() {}
