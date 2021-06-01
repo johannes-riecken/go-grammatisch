@@ -28,6 +28,16 @@ json.Unmarshal(data, &y)\n";
     return $ret;
 }
 
+sub marshal {
+    my ($name) = @_; # struct_name
+    return qq[func (x $name) MarshalJSON() ([]byte, error) {
+type marshal $name
+y := marshal(x)
+y.Type = "$name"
+return json.Marshal(y)
+}];
+}
+
 sub possibleStructs {
     my $ret = "possibleStructs := map[string][]interface{}\{\n";
     for (keys %interface_srcs) {
@@ -124,6 +134,7 @@ for my $k (@struct_srcs_keys) {
     my $v = $struct_srcs{$k};
     say addMember $v, 'Type string';
     say unmarshal $k;
+    say marshal $k;
 }
 
 for (@function_srcs) {
