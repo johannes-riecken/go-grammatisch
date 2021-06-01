@@ -143,38 +143,32 @@ for (@function_srcs) {
 
 
 __DATA__
-type Op interface {
-	ToRegex()
+type Define struct {
+	DefineName string
+	RegexSteps Step
 }
 
-type createNodesOp struct {
-	Count int
-    CountParam Op
+type Step interface {
+	RegexStepMarker()
+	String() string
 }
 
-func (*createNodesOp) ToRegex() {
+type PositionSaveStep struct {
 }
 
-type createNamespacesOp struct {
-	Prefix string
+type CallStep struct {
+	callee string
 }
 
-func (*createNamespacesOp) ToRegex() {
+type MatchCombineStep struct {
+	combineRuleName string
+	depth           int
 }
 
-type createPodsOp struct {
-	CollectMetrics bool
-    Namespace *string
+type MatchSaveStep struct {
+	SaveRuleName string
 }
 
-func (*createPodsOp) ToRegex() {
-}
-
-type Foo interface {
-}
-
-type barFoo struct {
-}
-
-type bazFoo struct {
+type MatchStep struct {
+	MatchString string
 }

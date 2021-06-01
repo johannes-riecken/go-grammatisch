@@ -94,12 +94,14 @@ func unquote(s string) string {
 }
 
 type RuleRef struct {
+	Type string
 	RuleRefName string
 }
 
 func (RuleRef) ElementMarker() {}
 
 type Quoted struct {
+	Type string
 	Quoted string
 }
 

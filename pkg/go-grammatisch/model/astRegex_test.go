@@ -1,6 +1,7 @@
 package model
 
 import (
+	"fmt"
 	"testing"
 	"encoding/json"
 )
@@ -50,6 +51,7 @@ func TestASTRegex_MarshalUnmarshal(t *testing.T) {
 			if err != nil {
 				t.Errorf("Marshaling of ASTRegex failed: %v", err)
 			}
+			fmt.Println(string(b))
 			var c ASTRegex
 			err = json.Unmarshal(b, &c)
 			if err != nil {
