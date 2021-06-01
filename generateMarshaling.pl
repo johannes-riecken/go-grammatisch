@@ -8,21 +8,23 @@ no warnings qw(experimental::smartmatch);
 tie my %interface_srcs, 'Tie::IxHash';
 tie my %struct_srcs, 'Tie::IxHash';
 tie my %func_srcs, 'Tie::IxHash';
-tie my %struct_members, 'Tie::IxHash';
+tie my %struct_members_refv, 'Tie::IxHash';
+my @function_srcs;
 
 sub unmarshal {
     my ($name) = @_; # struct_name
-    my $ret = "func (x *$name) UnmarshalJSON(b []byte) error {\n";
+    my $ret = "func (x *$name) UnmarshalJSON(data []byte) error {\n";
     $ret .= tmpStruct($name) . "\n";
     $ret .= "var y tmp
 json.Unmarshal(data, &y)\n";
-    for ($struct_members{$name}->@*) {
+    for ($struct_members_refv{$name}->@*) {
         my ($name, $type) = @$_;
         $ret .= ($interface_srcs{$type} ?
             unmarshalInterfaceAssign($name, $type) :
             structAssign($name)) . "\n";
     }
-    $ret .= "return nil";
+    $ret .= "return nil
+}";
     return $ret;
 }
 
@@ -50,7 +52,7 @@ sub implementations {
 sub tmpStruct {
     my ($struct_name) = @_;
     my $ret = "type tmp struct {\n";
-    for ($struct_members{$struct_name}->@*) {
+    for ($struct_members_refv{$struct_name}->@*) {
         my ($name, $type) = @$_;
         $ret .= "$name " .
             ($interface_srcs{$type} ? 'json.RawMessage' : $type) . "\n";
@@ -101,17 +103,37 @@ while (<DATA>) {
     } elsif (/^type (\w+) struct \{$/m) {
         my $struct_name = $1;
         $struct_srcs{$struct_name} = $_;
-        $struct_members{$struct_name} = [pairs split ' ', s/^.*\n((?:.*\n)*)\s*\}$/$1/r];
+        $struct_members_refv{$struct_name} = [pairs split ' ', s/^.*\n((?:.*\n)*)\s*\}$/$1/r];
+    } elsif (/^func/) {
+        push @function_srcs, $_;
     } else {
         die "Paragraph not recognized: $_";
     }
 }
 
-say unmarshal 'createNodesOp';
+say qq[package main
+import (
+"encoding/json"
+)];
+while (my ($_k, $v) = each %interface_srcs) {
+    say $v;
+}
+
+my @struct_srcs_keys = keys %struct_srcs;
+for my $k (@struct_srcs_keys) {
+    my $v = $struct_srcs{$k};
+    say addMember $v, 'Type string';
+    say unmarshal $k;
+}
+
+for (@function_srcs) {
+    say $_;
+}
+
 
 __DATA__
 type Op interface {
-	ToRegex() ASTRegex
+	ToRegex()
 }
 
 type createNodesOp struct {
@@ -119,13 +141,22 @@ type createNodesOp struct {
     CountParam Op
 }
 
+func (*createNodesOp) ToRegex() {
+}
+
 type createNamespacesOp struct {
 	Prefix string
+}
+
+func (*createNamespacesOp) ToRegex() {
 }
 
 type createPodsOp struct {
 	CollectMetrics bool
     Namespace *string
+}
+
+func (*createPodsOp) ToRegex() {
 }
 
 type Foo interface {
