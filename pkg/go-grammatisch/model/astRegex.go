@@ -57,16 +57,16 @@ type PositionSaveStep struct {
 func (PositionSaveStep) RegexStepMarker() {}
 
 type CallStep struct {
-	Type       string
-	callee string
+	Type   string
+	Callee string
 }
 
 func (CallStep) RegexStepMarker() {}
 
 type MatchCombineStep struct {
-	Type       string
-	combineRuleName string
-	depth           int
+	Type            string
+	CombineRuleName string
+	Depth           int
 }
 
 func (MatchCombineStep) RegexStepMarker() {}
@@ -90,13 +90,13 @@ func (PositionSaveStep) String() string {
 }
 
 func (c CallStep) String() string {
-	return fmt.Sprintf("(?&%v)", c.callee)
+	return fmt.Sprintf("(?&%v)", c.Callee)
 }
 
 func (m MatchCombineStep) String() string {
 	beginIdx := 1
 	endIdx := 2
-	arr := unfoldAnnotatedRegexTree(m.depth).indicesList()
+	arr := unfoldAnnotatedRegexTree(m.Depth).indicesList()
 	i0 := indexOfR(arr[0])
 	i1 := indexOfR(append(arr[1], beginIdx))
 	i2 := indexOfR(append(arr[len(arr)-1], endIdx))
@@ -107,7 +107,7 @@ func (m MatchCombineStep) String() string {
 			children.WriteString(", ")
 		}
 	}
-	return fmt.Sprintf("(?{ [%v, ['%v', %v, %v, [%v]]] })", i0, m.combineRuleName, i1, i2, children.String())
+	return fmt.Sprintf("(?{ [%v, ['%v', %v, %v, [%v]]] })", i0, m.CombineRuleName, i1, i2, children.String())
 }
 
 func (m MatchStep) String() string {

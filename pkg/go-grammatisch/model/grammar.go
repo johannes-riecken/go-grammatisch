@@ -51,7 +51,7 @@ func appendCtorStep(name string, regexSteps []RegexStep) []RegexStep {
 		}
 	}
 	if callStepCount > 0 {
-		return append(regexSteps, MatchCombineStep{combineRuleName: name, depth: callStepCount})
+		return append(regexSteps, MatchCombineStep{CombineRuleName: name, Depth: callStepCount})
 	} else {
 		return append(regexSteps, MatchSaveStep{SaveRuleName: name})
 	}
@@ -79,7 +79,7 @@ func (q Quoted) ToRegex() RegexStep {
 }
 
 func (r RuleRef) ToRegex() RegexStep {
-	return CallStep{callee: r.RuleRefName}
+	return CallStep{Callee: r.RuleRefName}
 }
 
 func isToken(s string) bool {
