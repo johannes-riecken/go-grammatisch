@@ -12,34 +12,34 @@ func AddRoutes(r *gin.Engine) {
 	globals := make(map[string]string)
 	r.GET("/index", getIndexHandler)
 	//r.Static("/static", "/Users/riecken/repos/go-grammatisch/pkg/templates/step00.gohtml")
-	r.LoadHTMLGlob("/Users/riecken/repos/go-grammatisch/pkg/templates/*.gohtml")
+	r.LoadHTMLGlob("/Users/rieckenj/repos/go-grammatisch/pkg/templates/*.gohtml")
 	r.GET("/step00", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "step00.gohtml", globals)
 	})
 	r.POST("/step01", func(c *gin.Context) {
-		addPostFormToGlobals(c, globals)
 		log.Println(c.PostForm("grammars"))
+		addPostFormToGlobals(c, globals)
 		c.HTML(http.StatusOK, "step01.gohtml", globals)
 	})
 	r.POST("/step02", func(c *gin.Context) {
-		addPostFormToGlobals(c, globals)
 		log.Println(c.PostForm("grammar"))
+		addPostFormToGlobals(c, globals)
 		globals["astRegex"] = "" // TODO: Construct Grammar from string and call .ToRegex(). In the beginning, do it all with JSON
 		c.HTML(http.StatusOK, "step02.gohtml", globals)
 	})
 	r.POST("/step03", func(c *gin.Context) {
-		addPostFormToGlobals(c, globals)
 		log.Println(c.PostForm("astRegex"))
+		addPostFormToGlobals(c, globals)
 		c.HTML(http.StatusOK, "step03.gohtml", globals)
 	})
 	r.POST("/step04", func(c *gin.Context) {
-		addPostFormToGlobals(c, globals)
 		log.Println(c.PostForm("inputDoc"))
+		addPostFormToGlobals(c, globals)
 		c.HTML(http.StatusOK, "step04.gohtml", globals)
 	})
 	r.POST("/step05", func(c *gin.Context) {
-		addPostFormToGlobals(c, globals)
 		log.Println(c.PostForm("ast"))
+		addPostFormToGlobals(c, globals)
 		c.Status(http.StatusOK)
 	})
 }
