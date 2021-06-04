@@ -3,6 +3,8 @@ package model
 import (
 	"fmt"
 	"log"
+	"os"
+	"os/exec"
 	"strings"
 )
 
@@ -22,6 +24,32 @@ func (a ASTRegex) String() string {
 	}
 	buf.WriteString(")")
 	return buf.String()
+}
+
+func (a *ASTRegex) Match(inputDoc string) (string, error) {
+	inputFile, err := os.Create("input.txt")
+	if err != nil {
+		return "", fmt.Errorf("failed to create input file: %v", err)
+	}
+	defer inputFile.Close()
+	_, err = inputFile.WriteString(inputDoc)
+	if err != nil {
+		return "", fmt.Errorf("failed to write to input file: %v", err)
+	}
+	regexFile, err := os.Create("regex.txt")
+	if err != nil {
+		return "", fmt.Errorf("failed to create regex file: %v", err)
+	}
+	defer regexFile.Close()
+	_, err = regexFile.WriteString(a.String())
+	if err != nil {
+		return "", fmt.Errorf("failed to write to regex file: %v", err)
+	}
+	ast, err := exec.Command("perl", "generateSyntaxTree.pl").Output()
+	if err != nil {
+		return "", fmt.Errorf("failed to execute perl script: %v", err)
+	}
+	return string(ast), nil
 }
 
 type Define struct {

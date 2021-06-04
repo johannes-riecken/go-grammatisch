@@ -1,6 +1,7 @@
 package server
 
 import (
+	"encoding/json"
 	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/johannes-riecken/go-grammatisch/pkg/go-grammatisch/model"
@@ -24,7 +25,19 @@ func AddRoutes(r *gin.Engine) {
 	r.POST("/step02", func(c *gin.Context) {
 		log.Println(c.PostForm("grammar"))
 		addPostFormToGlobals(c, globals)
-		globals["astRegex"] = "" // TODO: Construct Grammar from string and call .ToRegex(). In the beginning, do it all with JSON
+		var grammar model.Grammar
+		err := json.Unmarshal([]byte(globals["grammar"]), &grammar)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, err)
+			return
+		}
+		astRegex := grammar.ToRegex()
+		astRegexJSON, err := json.Marshal(astRegex)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, err)
+			return
+		}
+		globals["astRegex"] = string(astRegexJSON)
 		c.HTML(http.StatusOK, "step02.gohtml", globals)
 	})
 	r.POST("/step03", func(c *gin.Context) {
@@ -35,6 +48,15 @@ func AddRoutes(r *gin.Engine) {
 	r.POST("/step04", func(c *gin.Context) {
 		log.Println(c.PostForm("inputDoc"))
 		addPostFormToGlobals(c, globals)
+		var astRegex model.ASTRegex
+		json.Unmarshal([]byte(globals["astRegex"]), &astRegex)
+		inputDoc := globals["inputDoc"]
+		ast, err := astRegex.Match(inputDoc)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, err)
+			return
+		}
+		globals["ast"] = ast
 		c.HTML(http.StatusOK, "step04.gohtml", globals)
 	})
 	r.POST("/step05", func(c *gin.Context) {
