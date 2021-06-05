@@ -19,7 +19,7 @@ func TestASTRegex_String(t *testing.T) {
 			")",
 		},
 		{"pretty-print more complex regex", ASTRegex{Defines: []Define{{DefineName: "foo", RegexSteps: []RegexStep{CallStep{Callee: "Bar"}, CallStep{Callee: "Bar"}, MatchCombineStep{CombineRuleName: "foo", Depth: 2}}},
-		{DefineName: "Bar", RegexSteps: []RegexStep{PositionSaveStep{}, MatchStep{MatchString: "baz"}, MatchSaveStep{SaveRuleName: "Bar"}}}}}, "\\A (?&foo) \\z\n" +
+			{DefineName: "Bar", RegexSteps: []RegexStep{PositionSaveStep{}, MatchStep{MatchString: "baz"}, MatchSaveStep{SaveRuleName: "Bar"}}}}}, "\\A (?&foo) \\z\n" +
 			"(?(DEFINE)\n" +
 			"(?<foo> (?&Bar) (?&Bar) (?{ [$^R->[0][0], ['foo', $^R->[0][1][1], $^R->[1][2], [$^R->[0][1], $^R->[1]]]] }) )\n" +
 			"(?<Bar> (?{ [$^R, pos()] }) (?: baz ) (?{ [$^R->[0], ['Bar', $^R->[1], pos(), []]] }) )\n" +
@@ -44,7 +44,7 @@ func TestASTRegex_MarshalUnmarshal(t *testing.T) {
 	}{
 		{"pretty-print simple regex", ASTRegex{Defines: []Define{{DefineName: "Foo", RegexSteps: []RegexStep{PositionSaveStep{Type: "PositionSaveStep"}, MatchStep{Type: "MatchStep", MatchString: "bar"}, MatchSaveStep{Type: "MatchSaveStep", SaveRuleName: "Foo"}}}}}},
 		{"pretty-print more complex regex", ASTRegex{Defines: []Define{{DefineName: "foo", RegexSteps: []RegexStep{CallStep{Type: "CallStep", Callee: "Bar"}, CallStep{Type: "CallStep", Callee: "Bar"}, MatchCombineStep{Type: "MatchCombineStep", CombineRuleName: "foo", Depth: 2}}},
-		{DefineName: "Bar", RegexSteps: []RegexStep{PositionSaveStep{Type: "PositionSaveStep"}, MatchStep{Type: "MatchStep", MatchString: "baz"}, MatchSaveStep{Type: "MatchSaveStep", SaveRuleName: "Bar"}}}}}},
+			{DefineName: "Bar", RegexSteps: []RegexStep{PositionSaveStep{Type: "PositionSaveStep"}, MatchStep{Type: "MatchStep", MatchString: "baz"}, MatchSaveStep{Type: "MatchSaveStep", SaveRuleName: "Bar"}}}}}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

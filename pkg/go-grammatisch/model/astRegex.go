@@ -79,7 +79,7 @@ type RegexStep interface {
 }
 
 type PositionSaveStep struct {
-	Type       string
+	Type string
 }
 
 func (PositionSaveStep) RegexStepMarker() {}
@@ -100,14 +100,14 @@ type MatchCombineStep struct {
 func (MatchCombineStep) RegexStepMarker() {}
 
 type MatchSaveStep struct {
-	Type       string
+	Type         string
 	SaveRuleName string
 }
 
 func (MatchSaveStep) RegexStepMarker() {}
 
 type MatchStep struct {
-	Type       string
+	Type        string
 	MatchString string
 }
 

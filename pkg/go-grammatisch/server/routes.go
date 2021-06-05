@@ -2,9 +2,10 @@ package server
 
 import (
 	"encoding/json"
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/johannes-riecken/go-grammatisch/pkg/go-grammatisch/model"
-	"net/http"
 )
 
 func AddRoutes(r *gin.Engine) {
