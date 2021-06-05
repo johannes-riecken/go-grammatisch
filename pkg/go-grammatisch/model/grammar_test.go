@@ -39,8 +39,8 @@ func TestGrammar_ToRegex(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := tt.args
-			if got := g.ToRegex(); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("ToRegex() = %v, want %v", got, tt.want)
+			if got := g.Process(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Process() = %v, want %v", got, tt.want)
 			}
 		})
 	}

@@ -8,7 +8,7 @@ type Grammar struct {
 	RuleSpecs []RuleSpec
 }
 
-func (g *Grammar) ToRegex() ASTRegex {
+func (g *Grammar) Process() ASTRegex {
 	defines := make([]Define, len(g.RuleSpecs))
 	for i, x := range g.RuleSpecs {
 		defines[i] = x.ToRegex()

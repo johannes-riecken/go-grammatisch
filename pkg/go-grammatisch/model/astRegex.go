@@ -26,7 +26,7 @@ func (a ASTRegex) String() string {
 	return buf.String()
 }
 
-func (a *ASTRegex) Match(inputDoc string) (string, error) {
+func (a *ASTRegex) Process(inputDoc string) (string, error) {
 	inputFile, err := os.Create("input.txt")
 	if err != nil {
 		return "", fmt.Errorf("failed to create input file: %v", err)
