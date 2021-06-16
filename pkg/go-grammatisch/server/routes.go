@@ -74,6 +74,7 @@ func AddRoutes(r *gin.Engine) {
 }
 
 func addPostFormToGlobals(c *gin.Context, globals map[string]string) {
+	_ = c.PostForm("")
 	for k, v := range c.Request.PostForm {
 		globals[k] = v[0]
 	}
