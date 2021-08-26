@@ -1,13 +1,18 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
 	"github.com/johannes-riecken/go-grammatisch/pkg/go-grammatisch/server"
+	"log"
+	"net/http"
 )
 
+func mainAux() error {
+	server.AddRoutes()
+	return http.ListenAndServe(":8080", nil)
+}
+
 func main() {
-	r := gin.Default()
-	r.LoadHTMLGlob("pkg/templates/*")
-	server.AddRoutes(r)
-	_ = r.Run()
+	if err := mainAux(); err != nil {
+		log.Fatal(err)
+	}
 }
