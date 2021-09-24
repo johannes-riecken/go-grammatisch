@@ -4,6 +4,7 @@ use Data::Dumper;
 use Tie::IxHash;
 use List::Util qw(pairs);
 no warnings qw(experimental::smartmatch);
+use standard;
 
 tie my %interface_srcs, 'Tie::IxHash';
 tie my %struct_srcs, 'Tie::IxHash';
@@ -18,7 +19,7 @@ sub unmarshal {
     $ret .= "var y tmp
 json.Unmarshal(data, &y)\n";
     for ($struct_members_refv{$name}->@*) {
-        my ($name, $type) = @$_;
+        my ($name, $type) = $_->@*;
         $ret .= ($interface_srcs{$type} ?
             unmarshalInterfaceAssign($name, $type) :
             structAssign($name)) . "\n";
@@ -30,19 +31,19 @@ json.Unmarshal(data, &y)\n";
 
 sub marshal {
     my ($name) = @_; # struct_name
-    return qq[func (x $name) MarshalJSON() ([]byte, error) {
+    return qq!func (x $name) MarshalJSON() ([]byte, error) {
 type marshal $name
 y := marshal(x)
 y.Type = "$name"
 return json.Marshal(y)
-}];
+}!;
 }
 
 sub possibleStructs {
     my $ret = "possibleStructs := map[string][]interface{}\{\n";
     for (keys %interface_srcs) {
         my @impls = implementations($_);
-        $ret .= qq["$_": []$_\{\n];
+        $ret .= qq!"$_": []$_\{\n!;
         for my $impl (@impls) {
             $ret .= "&$impl\{},\n";
         }
@@ -63,7 +64,7 @@ sub tmpStruct {
     my ($struct_name) = @_;
     my $ret = "type tmp struct {\n";
     for ($struct_members_refv{$struct_name}->@*) {
-        my ($name, $type) = @$_;
+        my ($name, $type) = $_->@*;
         $ret .= "$name " .
             ($interface_srcs{$type} ? 'json.RawMessage' : $type) . "\n";
     }
@@ -113,7 +114,7 @@ while (<DATA>) {
     } elsif (/^type (\w+) struct \{$/m) {
         my $struct_name = $1;
         $struct_srcs{$struct_name} = $_;
-        $struct_members_refv{$struct_name} = [pairs split ' ', s/^.*\n((?:.*\n)*)\s*\}$/$1/r];
+        $struct_members_refv{$struct_name} = [pairs(split ' ', s/^.*\n((?:.*\n)*)\s*\}$/$1/r)];
     } elsif (/^func/) {
         push @function_srcs, $_;
     } else {
@@ -132,9 +133,9 @@ while (my ($_k, $v) = each %interface_srcs) {
 my @struct_srcs_keys = keys %struct_srcs;
 for my $k (@struct_srcs_keys) {
     my $v = $struct_srcs{$k};
-    say addMember $v, 'Type string';
-    say unmarshal $k;
-    say marshal $k;
+    say addMember($v, 'Type string');
+    say unmarshal($k);
+    say marshal($k);
 }
 
 for (@function_srcs) {
