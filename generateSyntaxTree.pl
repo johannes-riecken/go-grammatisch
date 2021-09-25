@@ -2,6 +2,7 @@
 use v5.20;
 use JSON::PP;
 use re 'eval';
+use standard;
 my $text;
 open my $f_regex, '<', 'regex.txt';
 { local $/; $text = <$f_regex>; }
@@ -12,4 +13,4 @@ open my $f_input, '<', 'input.txt';
 close $f_input;
 chomp;
 /$re/;
-say encode_json $^R->[1];
+say encode_json($^R->[1]);
