@@ -1,4 +1,4 @@
-FROM golang:1.17.3-bullseye
+FROM golang:rc
 WORKDIR /app
 COPY . .
 EXPOSE 8080
