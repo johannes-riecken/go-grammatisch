@@ -1,0 +1,3 @@
+{"Defines":[{"DefineName":"Foo","RegexSteps":[{"Type":"PositionSaveStep"},{"Type":"MatchStep","MatchString":"bar"},{"Type":"MatchSaveStep","SaveRuleName":"Foo"}]}]}
+{"Defines":[{"DefineName":"foo","RegexSteps":[{"Type":"CallStep"},{"Type":"CallStep"},{"Type":"MatchCombineStep"}]},{"DefineName":"Bar","RegexSteps":[{"Type":"PositionSaveStep"},{"Type":"MatchStep","MatchString":"baz"},{"Type":"MatchSaveStep","SaveRuleName":"Bar"}]}]}
+
