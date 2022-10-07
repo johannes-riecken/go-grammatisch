@@ -173,6 +173,21 @@ func (t *tree) indicesList() [][]int {
 	return ret
 }
 
+// unfoldAnnotatedRegexTree returns a tree with the given depth, where each node
+// is a list of indices. The indices are used to index into the syntax tree
+// Examples:
+// unfoldAnnotatedRegexTree(0):
+// []
+// unfoldAnnotatedRegexTree(1):
+// []
+// - [0]
+// - [1]
+// unfoldAnnotatedRegexTree(2):
+// []
+// - [0]
+//   - [0 0]
+//   - [0 1]
+// - [1]
 func unfoldAnnotatedRegexTree(n int) *tree {
 	var indexes []int
 	res := tree{val: indexes}
