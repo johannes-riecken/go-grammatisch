@@ -122,9 +122,9 @@ func (c CallStep) String() string {
 }
 
 func (m MatchCombineStep) String() string {
-	beginIdx := 1
+	beginIdx := 1 // 0: matched text, 1: beginIdx, 2: endIdx, 3: children
 	endIdx := 2
-	arr := unfoldAnnotatedRegexTree(m.Depth).indicesList()
+	arr := unfoldAnnotatedRegexTree(m.Depth).leafValues()
 	i0 := indexOfR(arr[0])
 	i1 := indexOfR(append(arr[1], beginIdx))
 	i2 := indexOfR(append(arr[len(arr)-1], endIdx))
@@ -146,10 +146,18 @@ func (m MatchSaveStep) String() string {
 	return fmt.Sprintf("(?{ [$^R->[0], ['%v', $^R->[1], pos(), []]] })", m.SaveRuleName)
 }
 
+// indexOfR formats a list of indexes.
+// Examples:
+// []int{1} -> "$^R->[1]"
+// []int{1, 2} -> "$^R->[1][2]"
 func indexOfR(indexes []int) string {
+	if len(indexes) == 0 {
+		panic("indexes must not be empty")
+	}
 	buf := new(strings.Builder)
 	buf.WriteString("$^R->[")
 	for i, x := range indexes {
+		// write x to the buffer
 		buf.WriteString(fmt.Sprintf("%v", x))
 		if i != len(indexes)-1 {
 			buf.WriteString("][")
@@ -159,22 +167,25 @@ func indexOfR(indexes []int) string {
 	return buf.String()
 }
 
-func (t *tree) indicesList() [][]int {
+// leafValues
+// Examples:
+// unfoldAnnotatedRegexTree(3).leafValues()
+// [[0 0 0] [0 0 1] [0 1] [1]]
+func (t *tree) leafValues() [][]int {
 	if t.left == nil && t.right == nil {
 		return [][]int{t.val}
 	}
 	var ret [][]int
 	if t.left != nil {
-		ret = append(ret, t.left.indicesList()...)
+		ret = append(ret, t.left.leafValues()...)
 	}
 	if t.right != nil {
-		ret = append(ret, t.right.indicesList()...)
+		ret = append(ret, t.right.leafValues()...)
 	}
 	return ret
 }
 
-// unfoldAnnotatedRegexTree returns a tree with the given depth, where each node
-// is a list of indices. The indices are used to index into the syntax tree
+// unfoldAnnotatedRegexTree
 // Examples:
 // unfoldAnnotatedRegexTree(0):
 // []
@@ -188,6 +199,15 @@ func (t *tree) indicesList() [][]int {
 //   - [0 0]
 //   - [0 1]
 // - [1]
+// unfoldAnnotatedRegexTree(3):
+// []
+// - [0]
+//   - [0 0]
+//     - [0 0 0]
+//     - [0 0 1]
+//   - [0 1]
+// - [1]
+
 func unfoldAnnotatedRegexTree(n int) *tree {
 	var indexes []int
 	res := tree{val: indexes}
