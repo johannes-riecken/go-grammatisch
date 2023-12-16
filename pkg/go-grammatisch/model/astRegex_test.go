@@ -7,6 +7,13 @@ import (
 	"testing"
 )
 
+func FuzzMatchCombineStepString(f *testing.F) {
+	f.Fuzz(func(t *testing.T, typ string, combineRuleName string, depth int) {
+		x := MatchCombineStep{Type: typ, CombineRuleName: combineRuleName, Depth: depth}
+		_ = x.String()
+	})
+}
+
 func TestASTRegex_String(t *testing.T) {
 	tests := []struct {
 		name string
